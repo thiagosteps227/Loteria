@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -30,12 +31,12 @@ class LoteriaApp extends JFrame implements ActionListener {
 	private JButton insertDrawsBtn = new JButton("Inserir um sorteio");
 	private JButton updateDrawsBtn = new JButton("Modificar um sorteio");
 	private JButton deleteDrawBtn = new JButton("Deletar um sorteio");
-	// private JButton instructorsButton = new JButton("INSTRUCTORS");
+	private JButton instructorsButton = new JButton("INSTRUCTORS");
 	// private JButton divesitesButton = new JButton("DIVE SITES( Clear | Turbid
 	// )");
 
 	// Create Text Fields
-	private JTextField lookDiveDates = new JTextField(6);
+	private JTextField insertDrawsTxtBox = new JTextField(6);
 	private JTextField lookDives = new JTextField(10);
 	private JTextField lookDepth = new JTextField(6);
 
@@ -47,19 +48,22 @@ class LoteriaApp extends JFrame implements ActionListener {
 		super(str);
 
 		// Set the layout format (4 Rows * 4 Columns)
-		getContentPane().setLayout(new GridLayout(4, 4));
+		getContentPane().setLayout(new GridLayout(6, 6));
 
 		// Connect to the Database
 		initDBConnection();
 
 		// Add the GUI components
-		getContentPane().add(selectDrawsBtn);
-		getContentPane().add(insertDrawsBtn);
-		// getContentPane().add(instructorsButton);
+
+		getContentPane().add(instructorsButton);
 		getContentPane().add(deleteDrawBtn);
+
 		getContentPane().add(updateDrawsBtn);
+		getContentPane().add(insertDrawsBtn);
 		// getContentPane().add(divesitesButton);
-		getContentPane().add(lookDiveDates);
+		getContentPane().add(insertDrawsTxtBox);
+		getContentPane().add(selectDrawsBtn);
+
 		getContentPane().add(lookDepth);
 
 		// Add some listeners to monitor for actions (i.e. button presses)
@@ -67,9 +71,9 @@ class LoteriaApp extends JFrame implements ActionListener {
 		insertDrawsBtn.addActionListener(this);
 		updateDrawsBtn.addActionListener(this);
 		deleteDrawBtn.addActionListener(this);
-		// instructorsButton.addActionListener(this);
+		instructorsButton.addActionListener(this);
 		// divesitesButton.addActionListener(this);
-		lookDiveDates.addActionListener(this);
+		insertDrawsTxtBox.addActionListener(this);
 		lookDepth.addActionListener(this);
 
 		// Set the Window Size
@@ -140,12 +144,21 @@ class LoteriaApp extends JFrame implements ActionListener {
 			try {
 
 				List<Draw> draws = lotteryDao.selectAllDraws();
+				ArrayList<String> numbersList = new ArrayList<String>();
+				String listNumbers = null;
 
 				for (int i = 0; i < draws.size(); i++) {
 
 					System.out.println(draws.get(i).getDrawNumbers());
+					String numbers = draws.get(i).getDrawNumbers();
+					numbersList.add(numbers);
 
 				}
+				for (String s : numbersList) {
+					listNumbers += s + "\n";
+
+				}
+				lookDepth.setText(listNumbers);
 
 			} catch (Exception e1) {
 
@@ -158,9 +171,12 @@ class LoteriaApp extends JFrame implements ActionListener {
 
 				Draw draws = new Draw();
 
-				draws.setDrawNumbers("12,23,34,45");
+				String numbers = insertDrawsTxtBox.getText();
+				draws.setDrawNumbers(numbers);
 
 				lotteryDao.insertDraws(draws);
+
+				insertDrawsTxtBox.setText("");
 
 				System.out.println(draws.getDrawNumbers());
 
